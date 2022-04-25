@@ -1,0 +1,6 @@
+*__pycache__*
+*.idea*
+*.ipynb*
+autoencoded_generation
+direct_generation
+data
