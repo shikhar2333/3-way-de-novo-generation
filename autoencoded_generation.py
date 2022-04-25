@@ -60,8 +60,8 @@ def get_mol_voxels(smile_str):
 
     # Generate sigmas
     sigmas, coords, lig_center = generate_sigmas(mol)
-    #vox, centers = voxelize(sigmas, coords, lig_center, rotation=False)
-    vox = voxelize(sigmas, coords, lig_center, rotation=False)
+    vox, centers = voxelize(sigmas, coords, lig_center, rotation=False)
+    #vox = voxelize(sigmas, coords, lig_center, rotation=False)
     vox = torch.Tensor(vox).to('cuda')
     return vox[:5], vox[5:]
 

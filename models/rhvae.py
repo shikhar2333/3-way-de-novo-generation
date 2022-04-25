@@ -494,15 +494,3 @@ class RH_VAE(nn.Module):
         return model_weights["model_state_dict"], model_weights["M"],\
                 model_weights["centroids"]
 
-if __name__ == '__main__':
-    x = torch.randn(1, 5, 24, 24, 24)
-    x = x.cuda()
-    cond_x = torch.randn(1, 2, 24, 24, 24)
-    cond_x = cond_x.cuda()
-    encoder = Encoder(latent_dim=32).to('cuda')
-    decoder = Decoder(latent_dim=32).to('cuda')
-    mu, logvar = encoder(x)
-    z, _ = reparametrize(mu, logvar)
-    #print(z.shape)
-    recon_x = decoder(z, cond_x)
-    print(recon_x.shape)

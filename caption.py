@@ -1,16 +1,10 @@
 import torch
 import torch.nn.functional as F
-#from utils.voxelize import getVoxelDescriptors
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from moleculekit.smallmol.smallmol import SmallMol
 import argparse
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-def init_hidden_states(init_c, init_h, encoder_output):
-    mean_encoder_output = encoder_output.mean(dim=1)
-    h = init_h(mean_encoder_output)
-    c = init_c(mean_encoder_output)
-    return h,c
         
 #def generate_representation(in_smile):
     #"""
@@ -155,32 +149,3 @@ def decode_smiles(smiles_list, idx_to_w):
         smiles.add(s)
     return smiles
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input", default="saved_models", help="""Path to
-            model weights""")
-    parser.add_argument("-b", "--beam_size", default=3, type=int,
-            help="""beam_size for beam search""")
-    parser.add_argument("-s", "--smile_input",
-            default="CN(C)Cc1ccc(CNC(=S)Nc2ccc(N)cc2)cc1", help="smile_input")
-    args = parser.parse_args()
-    encoder = CNN_Encoder(5).to(device) 
-    decoder = MolDecoder(512, 512, 512).to(device)
-    encoder.eval()
-    decoder.eval()
-    encoder_weights = args.input + "/encoder-20000.pkl"
-    decoder_weights = args.input + "/decoder-20000.pkl"
-    encoder.load_state_dict(torch.load(encoder_weights, map_location="cpu"))
-    decoder.load_state_dict(torch.load(decoder_weights, map_location="cpu"))
-    vocab_list = ["pad", "start", "end",
-        "C", "c", "N", "n", "S", "s", "P", "O", "o",
-        "B", "F", "I",
-        "X", "Y", "Z",
-        "1", "2", "3", "4", "5", "6",
-        "#", "=", "-", "(", ")"
-    ]
-    vocab_i2c_v1 = {i: x for i, x in enumerate(vocab_list)}
-    vocab_c2i_v1 = {vocab_i2c_v1[i]: i for i in vocab_i2c_v1}
-    outputs = caption_voxel_beam_search(encoder, decoder, args.smile_input, vocab_c2i_v1)
-    outputs = decode_smiles(outputs, vocab_i2c_v1)
-    print(outputs)
